@@ -3,6 +3,7 @@ package com.joana.backend.domain;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
