@@ -1,6 +1,8 @@
 package com.joana.backend.service;
 
 import com.joana.backend.domain.User;
+import com.joana.backend.dto.UserRequest;
+import com.joana.backend.dto.UserResponse;
 import com.joana.backend.exception.UserNotFoundException;
 import com.joana.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,23 +18,37 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserResponse(user.getId(), user.getName()))
+                .toList();
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
+        return new UserResponse(user.getId(), user.getName());
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserResponse createUser(UserRequest request) {
+        User user = new User();
+        user.setName(request.getName());
+
+        User saved = userRepository.save(user);
+
+        return new UserResponse(saved.getId(), saved.getName());
     }
 
-    public User updateUser(Long id, User updatedUser) {
-        User user = getUserById(id);
-        user.setName(updatedUser.getName());
-        return userRepository.save(user);
+    public UserResponse updateUser(Long id, UserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        user.setName(request.getName());
+        User updated = userRepository.save(user);
+
+        return new UserResponse(updated.getId(), updated.getName());
     }
 
     public void deleteUser(Long id) {
