@@ -19,8 +19,10 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserResponse> getUsers(
+            @RequestParam(required = false) String keyword
+    ) {
+        return userService.getAllUsers(keyword);
     }
 
     @GetMapping("/{id}")
